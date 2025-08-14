@@ -8,13 +8,13 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (context) => TransactionProvider(),
-      child: const MyApp(),
+      child: const MyApp(), // Tambahkan const di sini
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key); // Tambahkan const constructor
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen(),
+      home: const HomeScreen(), // Tambahkan const di sini
       debugShowCheckedModeBanner: false,
     );
   }

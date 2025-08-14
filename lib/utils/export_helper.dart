@@ -9,13 +9,13 @@ class ExportHelper {
   static Future<String> exportToCSV(
       List<FinanceTransaction> transactions) async {
     try {
-      // Header CSV
-      List<List<dynamic>> csvData = [
+      // Header CSV - gunakan final
+      final List<List<dynamic>> csvData = [
         ['ID', 'Judul', 'Jumlah', 'Tanggal', 'Jenis', 'Kategori']
       ];
 
-      // Data transaksi
-      for (var transaction in transactions) {
+      // Data transaksi - gunakan final dalam loop
+      for (final transaction in transactions) {
         csvData.add([
           transaction.id,
           transaction.title,
@@ -26,10 +26,10 @@ class ExportHelper {
         ]);
       }
 
-      // Konversi ke CSV string
-      String csv = const ListToCsvConverter().convert(csvData);
+      // Konversi ke CSV string - gunakan final
+      final String csv = const ListToCsvConverter().convert(csvData);
 
-      // Dapatkan direktori download
+      // Dapatkan direktori download - gunakan final
       Directory? directory;
 
       if (Platform.isAndroid) {
@@ -40,11 +40,9 @@ class ExportHelper {
       } else if (Platform.isIOS) {
         directory = await getApplicationDocumentsDirectory();
       } else {
-        // Untuk web/desktop
-        directory = await getDownloadsDirectory();
-        if (directory == null) {
-          directory = await getTemporaryDirectory();
-        }
+        // Untuk web/desktop - gunakan null-aware assignment
+        directory =
+            (await getDownloadsDirectory()) ?? await getTemporaryDirectory();
       }
 
       // Cek jika directory masih null
@@ -52,14 +50,14 @@ class ExportHelper {
         throw Exception('Tidak dapat mengakses direktori penyimpanan');
       }
 
-      // Buat nama file dengan timestamp
-      String fileName =
+      // Buat nama file dengan timestamp - gunakan final
+      final String fileName =
           'keuangan_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.csv';
 
-      String filePath = '${directory.path}/$fileName';
+      final String filePath = '${directory.path}/$fileName';
 
-      // Tulis file
-      File file = File(filePath);
+      // Tulis file - gunakan final
+      final File file = File(filePath);
       await file.writeAsString(csv, encoding: utf8);
 
       return filePath;
@@ -71,21 +69,22 @@ class ExportHelper {
   static Future<String> exportToText(
       List<FinanceTransaction> transactions) async {
     try {
-      StringBuffer buffer = StringBuffer();
+      // Gunakan final
+      final StringBuffer buffer = StringBuffer();
 
-      // Header
+      // Header - gunakan final untuk variabel
       buffer.writeln('LAPORAN KEUANGAN');
       buffer.writeln(
           'Tanggal Export: ${DateFormat('dd MMM yyyy HH:mm').format(DateTime.now())}');
       buffer.writeln('=' * 50);
       buffer.writeln();
 
-      // Ringkasan
-      double totalIncome = transactions
+      // Ringkasan - gunakan final
+      final double totalIncome = transactions
           .where((tx) => tx.isIncome)
           .fold(0.0, (sum, tx) => sum + tx.amount);
 
-      double totalExpense = transactions
+      final double totalExpense = transactions
           .where((tx) => !tx.isIncome)
           .fold(0.0, (sum, tx) => sum + tx.amount);
 
@@ -99,11 +98,11 @@ class ExportHelper {
       buffer.writeln('-' * 50);
       buffer.writeln();
 
-      // Detail transaksi
+      // Detail transaksi - gunakan final dalam loop
       buffer.writeln('DETAIL TRANSAKSI:');
       buffer.writeln();
 
-      for (var transaction in transactions) {
+      for (final transaction in transactions) {
         buffer.writeln(
             '${transaction.isIncome ? '▶' : '◀'} ${transaction.title}');
         buffer.writeln('   Kategori: ${transaction.category}');
@@ -114,7 +113,7 @@ class ExportHelper {
         buffer.writeln();
       }
 
-      // Dapatkan direktori
+      // Dapatkan direktori - gunakan final
       Directory? directory;
       if (Platform.isAndroid) {
         directory = Directory('/storage/emulated/0/Download');
@@ -124,10 +123,9 @@ class ExportHelper {
       } else if (Platform.isIOS) {
         directory = await getApplicationDocumentsDirectory();
       } else {
-        directory = await getDownloadsDirectory();
-        if (directory == null) {
-          directory = await getTemporaryDirectory();
-        }
+        // Gunakan null-aware assignment
+        directory =
+            (await getDownloadsDirectory()) ?? await getTemporaryDirectory();
       }
 
       // Cek jika directory masih null
@@ -135,14 +133,14 @@ class ExportHelper {
         throw Exception('Tidak dapat mengakses direktori penyimpanan');
       }
 
-      // Buat nama file
-      String fileName =
+      // Buat nama file - gunakan final
+      final String fileName =
           'laporan_keuangan_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.txt';
 
-      String filePath = '${directory.path}/$fileName';
+      final String filePath = '${directory.path}/$fileName';
 
-      // Tulis file
-      File file = File(filePath);
+      // Tulis file - gunakan final
+      final File file = File(filePath);
       await file.writeAsString(buffer.toString(), encoding: utf8);
 
       return filePath;
@@ -155,13 +153,13 @@ class ExportHelper {
   static Future<String> createBackup(
       List<FinanceTransaction> transactions) async {
     try {
-      // Konversi ke JSON
-      List<Map<String, dynamic>> jsonList =
+      // Konversi ke JSON - gunakan final
+      final List<Map<String, dynamic>> jsonList =
           transactions.map((tx) => tx.toMap()).toList();
 
-      String jsonString = jsonEncode(jsonList);
+      final String jsonString = jsonEncode(jsonList);
 
-      // Dapatkan direktori
+      // Dapatkan direktori - gunakan final
       Directory? directory;
       if (Platform.isAndroid) {
         directory = Directory('/storage/emulated/0/Download');
@@ -171,10 +169,9 @@ class ExportHelper {
       } else if (Platform.isIOS) {
         directory = await getApplicationDocumentsDirectory();
       } else {
-        directory = await getDownloadsDirectory();
-        if (directory == null) {
-          directory = await getTemporaryDirectory();
-        }
+        // Gunakan null-aware assignment
+        directory =
+            (await getDownloadsDirectory()) ?? await getTemporaryDirectory();
       }
 
       // Cek jika directory masih null
@@ -182,14 +179,14 @@ class ExportHelper {
         throw Exception('Tidak dapat mengakses direktori penyimpanan');
       }
 
-      // Buat nama file backup
-      String fileName =
+      // Buat nama file backup - gunakan final
+      final String fileName =
           'backup_keuangan_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.json';
 
-      String filePath = '${directory.path}/$fileName';
+      final String filePath = '${directory.path}/$fileName';
 
-      // Tulis file
-      File file = File(filePath);
+      // Tulis file - gunakan final
+      final File file = File(filePath);
       await file.writeAsString(jsonString, encoding: utf8);
 
       return filePath;

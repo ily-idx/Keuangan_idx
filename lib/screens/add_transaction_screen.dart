@@ -166,8 +166,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       await Provider.of<TransactionProvider>(context, listen: false)
           .addTransaction(transaction);
 
+      // Perbaiki bagian ini:
       if (mounted) {
-        // Tambahkan block untuk if statement
+        // Tambahkan kurung kurawal {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -175,7 +176,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             backgroundColor: Colors.green,
           ),
         );
-      }
+      } // Tambahkan kurung kurawal }
     }
   }
 }

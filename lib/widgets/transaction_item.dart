@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../models/finance_transaction.dart';
 import '../screens/edit_transaction_screen.dart';
 
@@ -19,52 +20,64 @@ class TransactionItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       elevation: 2,
       child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: transaction.isIncome
-                ? Colors.green.withOpacity(0.2)
-                : Colors.red.withOpacity(0.2),
-          ),
-          child: Icon(
-            _getCategoryIcon(transaction.category),
-            color: transaction.isIncome ? Colors.green : Colors.red,
-          ),
-        ),
+        leading: _buildLeadingIcon(),
         title: Text(
           transaction.title,
           style: const TextStyle(
             fontWeight: FontWeight.w500,
           ),
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              transaction.category,
-              style: const TextStyle(
-                color: Colors.blue,
-                fontSize: 12,
-              ),
-            ),
-            Text(
-              DateFormat('dd/MM/yyyy').format(transaction.date),
-              style: const TextStyle(
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-        trailing: Text(
-          '${transaction.isIncome ? '+' : '-'} Rp ${NumberFormat('#,##0').format(transaction.amount)}',
-          style: TextStyle(
-            color: transaction.isIncome ? Colors.green : Colors.red,
-            fontWeight: FontWeight.bold,
+        subtitle: _buildSubtitle(),
+        trailing: _buildAmountText(),
+        onTap: () => _editTransaction(context),
+        onLongPress: _showDeleteConfirmation,
+      ),
+    );
+  }
+
+  Widget _buildLeadingIcon() {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: transaction.isIncome
+            ? Colors.green.withOpacity(0.2)
+            : Colors.red.withOpacity(0.2),
+      ),
+      child: Icon(
+        _getCategoryIcon(transaction.category),
+        color: transaction.isIncome ? Colors.green : Colors.red,
+      ),
+    );
+  }
+
+  Widget _buildSubtitle() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          transaction.category,
+          style: const TextStyle(
+            color: Colors.blue,
+            fontSize: 12,
           ),
         ),
-        onTap: () => _editTransaction(context), // Tambahkan onTap untuk edit
-        onLongPress: onDelete, // Long press untuk hapus
+        Text(
+          DateFormat('dd/MM/yyyy').format(transaction.date),
+          style: const TextStyle(
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAmountText() {
+    return Text(
+      '${transaction.isIncome ? '+' : '-'} Rp ${NumberFormat('#,##0').format(transaction.amount)}',
+      style: TextStyle(
+        color: transaction.isIncome ? Colors.green : Colors.red,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
@@ -78,8 +91,17 @@ class TransactionItem extends StatelessWidget {
     );
   }
 
+  void _showDeleteConfirmation() {
+    // Bisa diganti dengan dialog konfirmasi atau toast
+    Fluttertoast.showToast(
+      msg: "Tekan dan tahan untuk hapus",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+    );
+  }
+
   IconData _getCategoryIcon(String category) {
-    final Map<String, IconData> categoryIcons = {
+    const categoryIcons = {
       'Gaji': Icons.work,
       'Bonus': Icons.card_giftcard,
       'Investasi': Icons.trending_up,

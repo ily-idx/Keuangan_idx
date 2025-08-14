@@ -10,6 +10,7 @@
 include: package:flutter_lints/flutter.yaml
 
 linter:
+
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
   # included above or to enable additional rules. A list of all available lints
@@ -21,6 +22,36 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
+   # Style rules
+    prefer_single_quotes: true
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_final_locals: true
+    prefer_final_in_for_each: true
+    unnecessary_this: true
+    unnecessary_new: true
+    unnecessary_const: true
+    avoid_print: true
+    use_key_in_widget_constructors: true
+    
+    # Error prevention
+    cancel_subscriptions: true
+    close_sinks: true
+    literal_only_boolean_expressions: true
+    no_logic_in_create_state: true
+    throw_in_finally: true
+    
+    # Documentation
+    public_member_api_docs: false  # Set true for production apps
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  errors:
+    unused_import: warning
+    unused_local_variable: warning
+    dead_code: warning
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 

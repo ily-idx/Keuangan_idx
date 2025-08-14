@@ -11,10 +11,12 @@ class EditTransactionScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _EditTransactionScreenState createState() => _EditTransactionScreenState();
+  State<EditTransactionScreen> createState() =>
+      _EditTransactionScreenState(); // Perbaiki tipe return
 }
 
 class _EditTransactionScreenState extends State<EditTransactionScreen> {
+  // Ini private, tidak masalah
   final _formKey = GlobalKey<FormState>();
   late String _title;
   late double _amount;
@@ -210,15 +212,16 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
       await Provider.of<TransactionProvider>(context, listen: false)
           .updateTransaction(updatedTransaction);
 
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Transaksi diperbarui'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+      // Perbaiki penggunaan context setelah async gap
+      if (!mounted) return; // Cek mounted untuk State
+      Navigator.pop(context);
+      if (!mounted) return; // Cek mounted lagi
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Transaksi diperbarui'),
+          backgroundColor: Colors.green,
+        ),
+      );
     }
   }
 
@@ -238,16 +241,18 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
               await Provider.of<TransactionProvider>(context, listen: false)
                   .deleteTransaction(widget.transaction.id!);
 
-              if (mounted) {
-                Navigator.pop(context); // Tutup dialog
-                Navigator.pop(context); // Tutup screen edit
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Transaksi dihapus'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
+              // Perbaiki penggunaan context setelah async gap
+              if (!mounted) return; // Cek mounted untuk State
+              Navigator.pop(context); // Tutup dialog
+              if (!mounted) return; // Cek mounted lagi
+              Navigator.pop(context); // Tutup screen edit
+              if (!mounted) return; // Cek mounted lagi
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Transaksi dihapus'),
+                  backgroundColor: Colors.red,
+                ),
+              );
             },
             child: const Text('Hapus'),
           ),
