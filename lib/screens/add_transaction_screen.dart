@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
+// Hapus import intl karena tidak digunakan
 import '../models/finance_transaction.dart';
 import '../providers/transaction_provider.dart';
 
 class AddTransactionScreen extends StatefulWidget {
+  const AddTransactionScreen({Key? key})
+      : super(key: key); // Tambahkan key parameter
+
   @override
-  _AddTransactionScreenState createState() => _AddTransactionScreenState();
+  State<AddTransactionScreen> createState() =>
+      _AddTransactionScreenState(); // Ganti tipe return
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
+  // Tipe class ini private, tidak masalah
   final _formKey = GlobalKey<FormState>();
   late String _title;
   late double _amount;
   bool _isIncome = true;
-  String _selectedCategory = 'Lainnya'; // Tambahkan variabel kategori
+  String _selectedCategory = 'Lainnya';
 
   // Daftar kategori
   final List<String> _incomeCategories = [
@@ -42,7 +47,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedCategory = _currentCategories.first; // Set kategori default
+    _selectedCategory = _currentCategories.first;
   }
 
   @override
@@ -155,13 +160,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         amount: _amount,
         date: DateTime.now(),
         isIncome: _isIncome,
-        category: _selectedCategory, // Tambahkan kategori
+        category: _selectedCategory,
       );
 
       await Provider.of<TransactionProvider>(context, listen: false)
           .addTransaction(transaction);
 
       if (mounted) {
+        // Tambahkan block untuk if statement
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

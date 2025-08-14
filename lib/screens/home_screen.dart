@@ -6,6 +6,7 @@ import '../providers/transaction_provider.dart';
 import '../widgets/transaction_list.dart';
 import '../screens/add_transaction_screen.dart';
 import '../utils/export_helper.dart';
+import '../widgets/search_delegate.dart'; // Tambahkan import
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -29,6 +30,17 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Keuangan Pribadi'),
         centerTitle: true,
         actions: [
+          // Tombol Search
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: TransactionSearchDelegate(),
+              );
+            },
+          ),
+          // Menu Popup
           PopupMenuButton<String>(
             onSelected: (String result) {
               switch (result) {
@@ -86,22 +98,6 @@ class _HomeScreenState extends State<HomeScreen> {
           return Column(
             children: [
               _buildBalanceCard(provider),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Transaksi Terbaru',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
               Expanded(
                 child: TransactionList(),
               ),
