@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../models/finance_transaction.dart';
 import '../screens/edit_transaction_screen.dart';
+import '../utils/constants.dart';
 
 class TransactionItem extends StatelessWidget {
   final FinanceTransaction transaction;
@@ -17,15 +18,22 @@ class TransactionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: _buildLeadingIcon(),
         title: Text(
           transaction.title,
           style: const TextStyle(
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         subtitle: _buildSubtitle(),
         trailing: _buildAmountText(),
@@ -37,16 +45,17 @@ class TransactionItem extends StatelessWidget {
 
   Widget _buildLeadingIcon() {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: transaction.isIncome
-            ? Colors.green.withOpacity(0.2)
-            : Colors.red.withOpacity(0.2),
+            ? AppColors.incomeLight
+            : AppColors.expenseLight,
       ),
       child: Icon(
         _getCategoryIcon(transaction.category),
-        color: transaction.isIncome ? Colors.green : Colors.red,
+        color: transaction.isIncome ? AppColors.income : AppColors.expense,
+        size: 24,
       ),
     );
   }
@@ -55,18 +64,41 @@ class TransactionItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          transaction.category,
-          style: const TextStyle(
-            color: Colors.blue,
-            fontSize: 12,
-          ),
+        Row(
+          children: [
+            Icon(
+              Icons.category,
+              size: 14,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              transaction.category,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
-        Text(
-          DateFormat('dd/MM/yyyy').format(transaction.date),
-          style: const TextStyle(
-            color: Colors.grey,
-          ),
+        const SizedBox(height: 2),
+        Row(
+          children: [
+            Icon(
+              Icons.access_time,
+              size: 14,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              DateFormat('dd MMM yyyy').format(transaction.date),
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -76,8 +108,9 @@ class TransactionItem extends StatelessWidget {
     return Text(
       '${transaction.isIncome ? '+' : '-'} Rp ${NumberFormat('#,##0').format(transaction.amount)}',
       style: TextStyle(
-        color: transaction.isIncome ? Colors.green : Colors.red,
+        color: transaction.isIncome ? AppColors.income : AppColors.expense,
         fontWeight: FontWeight.bold,
+        fontSize: 16,
       ),
     );
   }
@@ -92,11 +125,12 @@ class TransactionItem extends StatelessWidget {
   }
 
   void _showDeleteConfirmation() {
-    // Bisa diganti dengan dialog konfirmasi atau toast
     Fluttertoast.showToast(
       msg: "Tekan dan tahan untuk hapus",
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
+      backgroundColor: AppColors.primary,
+      textColor: Colors.white,
     );
   }
 

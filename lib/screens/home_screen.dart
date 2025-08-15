@@ -9,6 +9,7 @@ import '../screens/add_transaction_screen.dart';
 import '../utils/export_helper.dart';
 import '../widgets/search_delegate.dart';
 import '../utils/logger.dart';
+import '../utils/constants.dart'; // Tambahkan import
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -44,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
   AppBar _buildAppBar() {
     return AppBar(
       title: const Text('Keuangan Pribadi'),
-      centerTitle: true,
       actions: [
         _buildSearchButton(),
         _buildMenuButton(),
@@ -71,6 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return FloatingActionButton(
       onPressed: _navigateToAddTransaction,
       child: const Icon(Icons.add),
+      elevation: 4,
+      tooltip: 'Tambah Transaksi',
     );
   }
 
@@ -78,31 +80,33 @@ class _HomeScreenState extends State<HomeScreen> {
     return IconButton(
       icon: const Icon(Icons.search),
       onPressed: _openSearch,
+      tooltip: 'Cari Transaksi',
     );
   }
 
   Widget _buildMenuButton() {
     return PopupMenuButton<String>(
       onSelected: _handleMenuSelection,
+      icon: const Icon(Icons.more_vert),
       itemBuilder: (BuildContext context) => [
         const PopupMenuItem(
           value: 'export_csv',
           child: ListTile(
-            leading: Icon(Icons.table_chart),
+            leading: Icon(Icons.table_chart, color: AppColors.primary),
             title: Text('Export ke CSV'),
           ),
         ),
         const PopupMenuItem(
           value: 'export_text',
           child: ListTile(
-            leading: Icon(Icons.text_snippet),
+            leading: Icon(Icons.text_snippet, color: AppColors.primary),
             title: Text('Export ke Text'),
           ),
         ),
         const PopupMenuItem(
           value: 'backup',
           child: ListTile(
-            leading: Icon(Icons.backup),
+            leading: Icon(Icons.backup, color: AppColors.primary),
             title: Text('Backup Data'),
           ),
         ),
@@ -110,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const PopupMenuItem(
           value: 'refresh',
           child: ListTile(
-            leading: Icon(Icons.refresh),
+            leading: Icon(Icons.refresh, color: AppColors.primary),
             title: Text('Refresh'),
           ),
         ),
@@ -154,82 +158,102 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBalanceCard(TransactionProvider provider) {
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Colors.blue, Colors.lightBlue],
+          colors: [AppColors.primary, AppColors.primaryLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
-            blurRadius: 10,
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 15,
             offset: const Offset(0, 5),
           ),
         ],
       ),
-      child: Column(
-        children: [
-          const Text(
-            'Saldo Saat Ini',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.account_balance_wallet,
+                    color: Colors.white, size: 28),
+                SizedBox(width: 12),
+                Text(
+                  'Saldo Saat Ini',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Rp ${NumberFormat('#,##0').format(provider.balance)}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+            const SizedBox(height: 16),
+            Text(
+              'Rp ${NumberFormat('#,##0').format(provider.balance)}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          _buildIncomeExpenseRow(provider),
-        ],
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildIncomeExpenseItem(
+                  'Pemasukan',
+                  provider.totalIncome,
+                  AppColors.income,
+                  Icons.arrow_downward,
+                ),
+                Container(
+                  height: 40,
+                  width: 1,
+                  color: Colors.white.withOpacity(0.5),
+                ),
+                _buildIncomeExpenseItem(
+                  'Pengeluaran',
+                  provider.totalExpense,
+                  AppColors.expense,
+                  Icons.arrow_upward,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildIncomeExpenseRow(TransactionProvider provider) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildIncomeExpenseItem(
-          'Pemasukan',
-          provider.totalIncome,
-          Colors.green,
-        ),
-        Container(
-          height: 40,
-          width: 1,
-          color: Colors.white.withOpacity(0.5),
-        ),
-        _buildIncomeExpenseItem(
-          'Pengeluaran',
-          provider.totalExpense,
-          Colors.red,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildIncomeExpenseItem(String title, double amount, Color color) {
+  Widget _buildIncomeExpenseItem(
+      String title, double amount, Color color, IconData icon) {
     return Column(
       children: [
-        Text(
-          title,
-          style: const TextStyle(color: Colors.white),
+        Row(
+          children: [
+            Icon(icon, color: Colors.white, size: 18),
+            const SizedBox(width: 4),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
+        const SizedBox(height: 4),
         Text(
           'Rp ${NumberFormat('#,##0').format(amount)}',
           style: TextStyle(
-            color: color,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
+            fontSize: 16,
           ),
         ),
       ],
@@ -313,7 +337,9 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+        ),
       ),
     );
   }
@@ -326,18 +352,31 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('$type Berhasil'),
+        title: Row(
+          children: [
+            Icon(Icons.check_circle, color: AppColors.success),
+            const SizedBox(width: 12),
+            Text('$type Berhasil'),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('File telah disimpan di:'),
             const SizedBox(height: 8),
-            Text(
-              filePath,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                filePath,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
           ],
@@ -364,6 +403,8 @@ class _HomeScreenState extends State<HomeScreen> {
       msg: message,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
+      backgroundColor: AppColors.primary,
+      textColor: Colors.white,
     );
   }
 }

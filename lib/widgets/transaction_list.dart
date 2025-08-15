@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/transaction_provider.dart';
 import '../models/finance_transaction.dart';
 import 'transaction_item.dart';
+import '../utils/constants.dart';
 
 class TransactionList extends StatelessWidget {
   const TransactionList({Key? key}) : super(key: key);
@@ -13,9 +14,7 @@ class TransactionList extends StatelessWidget {
       builder: (context, provider, child) {
         return Column(
           children: [
-            // Filter Bar
             _buildFilterBar(context, provider),
-            // Transaction List
             Expanded(
               child: _buildTransactionContent(provider),
             ),
@@ -27,88 +26,103 @@ class TransactionList extends StatelessWidget {
 
   Widget _buildFilterBar(BuildContext context, TransactionProvider provider) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: AppColors.cardBackground,
         border: Border(
-          bottom:
-              BorderSide(color: Colors.grey[300]!), // Hapus ! yang tidak perlu
+          bottom: BorderSide(color: AppColors.divider),
         ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // Tombol Semua
-          FilterChip(
-            label: const Text('Semua'),
+          _buildFilterChip(
+            label: 'Semua',
             selected: provider.filterByType == null,
-            onSelected: (selected) {
-              provider.setFilterByType(null);
-            },
-            selectedColor: Colors.blue,
-            backgroundColor: Colors.white,
+            selectedColor: AppColors.primary,
+            onTap: () => provider.setFilterByType(null),
           ),
-          // Tombol Pemasukan
-          FilterChip(
-            label: const Text('Pemasukan'),
+          _buildFilterChip(
+            label: 'Pemasukan',
             selected: provider.filterByType == true,
-            onSelected: (selected) {
-              provider.setFilterByType(true);
-            },
-            selectedColor: Colors.green,
-            backgroundColor: Colors.white,
+            selectedColor: AppColors.income,
+            onTap: () => provider.setFilterByType(true),
           ),
-          // Tombol Pengeluaran
-          FilterChip(
-            label: const Text('Pengeluaran'),
+          _buildFilterChip(
+            label: 'Pengeluaran',
             selected: provider.filterByType == false,
-            onSelected: (selected) {
-              provider.setFilterByType(false);
-            },
-            selectedColor: Colors.red,
-            backgroundColor: Colors.white,
+            selectedColor: AppColors.expense,
+            onTap: () => provider.setFilterByType(false),
           ),
-          // Tombol Clear Filter
           if (provider.filterByType != null || provider.searchQuery.isNotEmpty)
             IconButton(
-              onPressed: () {
-                provider.clearFilters();
-              },
-              icon: const Icon(Icons.clear),
+              onPressed: provider.clearFilters,
+              icon: const Icon(Icons.clear, color: AppColors.error),
+              tooltip: 'Hapus Filter',
             ),
         ],
       ),
     );
   }
 
+  Widget _buildFilterChip({
+    required String label,
+    required bool selected,
+    required Color selectedColor,
+    required VoidCallback onTap,
+  }) {
+    return ChoiceChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          color: selected ? Colors.white : AppColors.textSecondary,
+          fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+        ),
+      ),
+      selected: selected,
+      selectedColor: selectedColor,
+      backgroundColor: AppColors.background,
+      onSelected: (selected) => onTap(),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      labelStyle: const TextStyle(fontSize: 13),
+    );
+  }
+
   Widget _buildTransactionContent(TransactionProvider provider) {
     if (provider.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+        ),
+      );
     }
 
     if (provider.transactions.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.account_balance_wallet_outlined,
-              size: 64,
-              color: Colors.grey,
+              size: 80,
+              color: AppColors.textSecondary.withOpacity(0.3),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Belum ada transaksi',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.w500,
+                color: AppColors.textPrimary,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 8),
+            const Text(
               'Tekan tombol + untuk menambahkan',
               style: TextStyle(
-                color: Colors.grey,
+                fontSize: 14,
+                color: AppColors.textSecondary,
               ),
             ),
           ],
@@ -135,7 +149,13 @@ class TransactionList extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Hapus Transaksi'),
+        title: const Row(
+          children: [
+            Icon(Icons.delete, color: AppColors.error),
+            SizedBox(width: 12),
+            Text('Hapus Transaksi'),
+          ],
+        ),
         content: const Text('Apakah Anda yakin ingin menghapus transaksi ini?'),
         actions: [
           TextButton(
@@ -149,7 +169,7 @@ class TransactionList extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Transaksi dihapus'),
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColors.error,
                 ),
               );
             },
